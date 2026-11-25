@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Library Management System</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --border: #334155;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --primary: #14b8a6;
+      --danger: #f87171;
+      --ok: #4ade80;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 8px;
+      padding: 10px 18px;
+      color: #04201c;
+      background: var(--primary);
+      font-weight: 700;
+    }
+
+    button:hover {
+      opacity: .9;
+    }
+
+    button.small {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #0b1220;
+      color: var(--text);
+      outline: 0;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--primary);
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .screen {
+      display: none;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    #loginScreen.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 18px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 440px;
+      text-align: center;
+    }
+
+    .login-card h1 {
+      font-size: 30px;
+      margin: 6px 0;
+    }
+
+    .login-card p,
+    .muted {
+      color: var(--muted);
+    }
+
+    .logo {
+      font-size: 46px;
+    }
+
+    .msg {
+      min-height: 20px;
+      margin-top: 10px;
+      font-size: 14px;
+      color: var(--danger);
+    }
+
+    .msg.ok {
+      color: var(--ok);
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    nav button {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    nav button.active {
+      background: var(--primary);
+      color: #04201c;
+    }
+
+    .wrap {
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .tab {
+      display: none;
+    }
+
+    .tab.active {
+      display: block;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      background: #0b1220;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .stat b {
+      display: block;
+      font-size: 30px;
+      color: var(--primary);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+
+    .table-box {
+      overflow-x: auto;
+      margin-top: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .late {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LOGIN SCREEN -->
+  <section id="loginScreen" class="screen active">
+    <div class="card login-card">
+      <div class="logo">&#128218;</div>
+      <h1>Library Management</h1>
+      <p>Manage books, members, issue and return</p>
+      <label for="librarianName" style="text-align:left">Enter Librarian Name</label>
+      <input id="librarianName" maxlength="30" placeholder="Enter your name...">
+      <p id="loginError" class="msg"></p>
+      <button id="loginBtn">Continue &rarr;</button>
+    </div>
+  </section>
+
+  <!-- MAIN APPLICATION -->
+  <section id="appScreen" class="screen">
+    <div class="wrap">
+      <header>
+        <div>
+          <h1>&#128218; Library Management System</h1>
+          <p class="muted">Welcome, <span id="welcomeName"></span></p>
+        </div>
+        <button id="logoutBtn" class="small">Logout</button>
+      </header>
+      <nav id="tabs">
+        <button data-tab="dashboard" class="active">Dashboard</button>
+        <button data-tab="books">Books</button>
+        <button data-tab="members">Members</button>
+        <button data-tab="issue">Issue Book</button>
+        <button data-tab="return">Return Book</button>
+      </nav>
+
+      <!-- Dashboard -->
+      <div id="tab-dashboard" class="tab active">
+        <div class="card">
+          <h2>Library Summary</h2>
+          <div class="stats" id="stats"></div>
+          <p class="muted" style="margin-top:14px">Rules: max 3 books per member, loan 1 to 14 days, fine Rs 2 per late
+            day.</p>
+        </div>
+      </div>
+
+      <!-- Books -->
+      <div id="tab-books" class="tab">
+        <div class="card">
+          <h2>Add New Book</h2>
+          <div class="row">
+            <div><label>Title</label><input id="bookTitle" maxlength="60"></div>
+            <div><label>Author</label><input id="bookAuthor" maxlength="40"></div>
+            <div><label>Copies (1 to 50)</label><input id="bookCopies" type="number" value="1"></div>
+            <button id="addBookBtn">Add Book</button>
+          </div>
+          <p id="bookMsg" class="msg"></p>
+        </div>
+        <div class="card">
+          <h2>All Books</h2>
+          <input id="searchBox" placeholder="Search by title or author...">
+          <div class="table-box">
+            <table id="bookTable"></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Members -->
+      <div id="tab-members" class="tab">
+        <div class="card">
+          <h2>Register Member</h2>
+          <div class="row">
+            <div><label>Member Name (2 to 30 characters)</label><input id="memName" maxlength="30"></div>
+            <div><label>Phone (10 digits)</label><input id="memPhone" maxlength="12"></div>
+            <button id="addMemberBtn">Add Member</button>
+          </div>
+          <p id="memMsg" class="msg"></p>
+        </div>
+        <div class="card">
+          <h2>All Members</h2>
+          <div class="table-box">
+            <table id="memberTable"></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Issue -->
+      <div id="tab-issue" class="tab">
+        <div class="card">
+          <h2>Issue a Book</h2>
+          <div class="row">
+            <div><label>Member</label><select id="issueMember"></select></div>
+            <div><label>Book</label><select id="issueBook"></select></div>
+            <div><label>Loan days (1 to 14)</label><input id="issueDays" type="number" value="7"></div>
+            <button id="issueBtn">Issue Book</button>
+          </div>
+          <p id="issueMsg" class="msg"></p>
+        </div>
+      </div>
+
+      <!-- Return -->
+      <div id="tab-return" class="tab">
+        <div class="card">
+          <h2>Return a Book</h2>
+          <div class="row">
+            <div><label>Return date (change it to test fine)</label><input id="returnDate" type="date"></div>
+          </div>
+          <p id="returnMsg" class="msg"></p>
+          <div class="table-box">
+            <table id="issueTable"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    /* ---------- Constants ---------- */
+    const KEY = "lms_data_v1";
+    const MAX_BOOKS = 3, FINE_PER_DAY = 2;
+
+    /* ---------- Data module ---------- */
+    function seedData() {
+      return {
+        books: [
+          { id: "B001", title: "Let Us C", author: "Yashavant Kanetkar", copies: 5, available: 5 },
+          { id: "B002", title: "Database System Concepts", author: "Silberschatz", copies: 3, available: 3 },
+          { id: "B003", title: "Computer Networks", author: "Andrew Tanenbaum", copies: 2, available: 2 }
+        ],
+        members: [
+          { id: "M001", name: "Rohit Sharma", phone: "9876543210" },
+          { id: "M002", name: "Neha Verma", phone: "9123456780" }
+        ],
+        issues: [], nextBook: 4, nextMember: 3, nextIssue: 1
+      };
+    }
+    function loadData() {
+      try { const d = JSON.parse(localStorage.getItem(KEY)); if (d && d.books) return d; } catch (e) { }
+      return seedData();
+    }
+    function saveData() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { } }
+    let state = loadData();
+
+    /* ---------- Helper functions ---------- */
+    const $ = id => document.getElementById(id);
+    const pad = n => String(n).padStart(3, "0");
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const today = () => new Date().toISOString().slice(0, 10);
+    function addDays(dateStr, n) { const d = new Date(dateStr); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); }
+    function daysBetween(a, b) { return Math.round((new Date(b) - new Date(a)) / 86400000); }
+    function setMsg(id, text, ok) { const el = $(id); el.textContent = text; el.className = ok ? "msg ok" : "msg"; }
+
+    /* ---------- Validation module ---------- */
+    function validateName(name) {
+      if (!name) return "Please enter a name.";
+      if (name.length < 2) return "Name must contain at least 2 characters.";
+      if (name.length > 30) return "Name must not exceed 30 characters.";
+      return "";
+    }
+    function validateCopies(n) {
+      if (!Number.isInteger(n) || n < 1 || n > 50) return "Copies must be between 1 and 50.";
+      return "";
+    }
+    function validatePhone(p) { return /^[0-9]{10}$/.test(p) ? "" : "Phone number must contain exactly 10 digits."; }
+    function validateDays(d) {
+      if (!Number.isInteger(d) || d < 1 || d > 14) return "Loan days must be between 1 and 14.";
+      return "";
+    }
+
+    /* ---------- Fine calculation module ---------- */
+    function calcFine(dueDate, returnDate) {
+      return Math.max(0, daysBetween(dueDate, returnDate)) * FINE_PER_DAY;
+    }
+
+    /* ---------- Book module ---------- */
+    function addBook() {
+      const title = $("bookTitle").value.trim(), author = $("bookAuthor").value.trim();
+      const copies = Number($("bookCopies").value);
+      if (!title || !author) return setMsg("bookMsg", "Please enter book title and author.");
+      const err = validateCopies(copies);
+      if (err) return setMsg("bookMsg", err);
+      state.books.push({ id: "B" + pad(state.nextBook++), title, author, copies, available: copies });
+      saveData(); renderAll();
+      $("bookTitle").value = ""; $("bookAuthor").value = ""; $("bookCopies").value = 1;
+      setMsg("bookMsg", "Book added successfully.", true);
+    }
+
+    /* ---------- Member module ---------- */
+    function addMember() {
+      const name = $("memName").value.trim(), phone = $("memPhone").value.trim();
+      const err = validateName(name) || validatePhone(phone);
+      if (err) return setMsg("memMsg", err);
+      state.members.push({ id: "M" + pad(state.nextMember++), name, phone });
+      saveData(); renderAll();
+      $("memName").value = ""; $("memPhone").value = "";
+      setMsg("memMsg", "Member registered successfully.", true);
+    }
+
+    /* ---------- Issue module ---------- */
+    function activeIssues(memberId) { return state.issues.filter(i => i.memberId === memberId && !i.returnDate); }
+    function issueBook() {
+      const memberId = $("issueMember").value, bookId = $("issueBook").value;
+      const days = Number($("issueDays").value);
+      const book = state.books.find(b => b.id === bookId);
+      if (!memberId || !book) return setMsg("issueMsg", "Please select a member and a book.");
+      const err = validateDays(days);
+      if (err) return setMsg("issueMsg", err);
+      if (book.available < 1) return setMsg("issueMsg", "No copy of this book is available.");
+      const current = activeIssues(memberId);
+      if (current.length >= MAX_BOOKS) return setMsg("issueMsg", "Member already has " + MAX_BOOKS + " books issued.");
+      if (current.some(i => i.bookId === bookId)) return setMsg("issueMsg", "Member already has this book.");
+      const issueDate = today();
+      state.issues.push({
+        id: "I" + pad(state.nextIssue++), bookId, memberId, issueDate,
+        dueDate: addDays(issueDate, days), returnDate: null, fine: 0
+      });
+      book.available--;
+      saveData(); renderAll();
+      setMsg("issueMsg", "Book issued. Due date: " + addDays(issueDate, days), true);
+    }
+
+    /* ---------- Return module ---------- */
+    function returnBook(issueId) {
+      const issue = state.issues.find(i => i.id === issueId);
+      const retDate = $("returnDate").value || today();
+      if (daysBetween(issue.issueDate, retDate) < 0) return setMsg("returnMsg", "Return date cannot be before issue date.");
+      issue.returnDate = retDate;
+      issue.fine = calcFine(issue.dueDate, retDate);
+      state.books.find(b => b.id === issue.bookId).available++;
+      saveData(); renderAll();
+      setMsg("returnMsg", issue.fine > 0 ? "Book returned. Fine to pay: Rs " + issue.fine : "Book returned. No fine.", true);
+    }
+
+    /* ---------- Rendering module ---------- */
+    function renderStats() {
+      const open = state.issues.filter(i => !i.returnDate);
+      const late = open.filter(i => i.dueDate < today()).length;
+      const items = [["Titles", state.books.length], ["Copies Available", state.books.reduce((s, b) => s + b.available, 0)],
+      ["Members", state.members.length], ["Books Issued", open.length], ["Overdue", late]];
+      $("stats").innerHTML = items.map(x => "<div class='stat'><b>" + x[1] + "</b>" + x[0] + "</div>").join("");
+    }
+    function renderBooks() {
+      const q = $("searchBox").value.trim().toLowerCase();
+      const list = state.books.filter(b => (b.title + " " + b.author).toLowerCase().includes(q));
+      $("bookTable").innerHTML = "<tr><th>ID</th><th>Title</th><th>Author</th><th>Copies</th><th>Available</th></tr>" +
+        list.map(b => "<tr><td>" + b.id + "</td><td>" + esc(b.title) + "</td><td>" + esc(b.author) +
+          "</td><td>" + b.copies + "</td><td>" + b.available + "</td></tr>").join("");
+    }
+    function renderMembers() {
+      $("memberTable").innerHTML = "<tr><th>ID</th><th>Name</th><th>Phone</th><th>Books Held</th></tr>" +
+        state.members.map(m => "<tr><td>" + m.id + "</td><td>" + esc(m.name) + "</td><td>" + esc(m.phone) +
+          "</td><td>" + activeIssues(m.id).length + "</td></tr>").join("");
+    }
+    function renderSelects() {
+      $("issueMember").innerHTML = state.members.map(m => "<option value='" + m.id + "'>" + esc(m.name) + "</option>").join("");
+      $("issueBook").innerHTML = state.books.filter(b => b.available > 0)
+        .map(b => "<option value='" + b.id + "'>" + esc(b.title) + " (" + b.available + ")</option>").join("");
+    }
+    function renderIssues() {
+      const open = state.issues.filter(i => !i.returnDate);
+      const rows = open.map(i => {
+        const b = state.books.find(x => x.id === i.bookId), m = state.members.find(x => x.id === i.memberId);
+        const late = i.dueDate < today() ? " class='late'" : "";
+        return "<tr><td>" + i.id + "</td><td>" + esc(b.title) + "</td><td>" + esc(m.name) + "</td><td>" + i.issueDate +
+          "</td><td" + late + ">" + i.dueDate + "</td><td><button class='small' onclick=\"returnBook('" + i.id + "')\">Return</button></td></tr>";
+      }).join("");
+      $("issueTable").innerHTML = "<tr><th>ID</th><th>Book</th><th>Member</th><th>Issued</th><th>Due</th><th></th></tr>" +
+        (rows || "<tr><td colspan='6' class='muted'>No books are currently issued.</td></tr>");
+    }
+    function renderAll() { renderStats(); renderBooks(); renderMembers(); renderSelects(); renderIssues(); }
+
+    /* ---------- Screen control and events ---------- */
+    function showScreen(id) {
+      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+      $(id).classList.add("active");
+    }
+    function showTab(name) {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
+      $("tab-" + name).classList.add("active");
+    }
+    $("loginBtn").onclick = () => {
+      const name = $("librarianName").value.trim();
+      const err = validateName(name);
+      if (err) { $("loginError").textContent = err.replace("a name", "your name"); return; }
+      $("welcomeName").textContent = name;
+      $("loginError").textContent = "";
+      $("returnDate").value = today();
+      renderAll(); showScreen("appScreen");
+    };
+    $("librarianName").onkeydown = e => { if (e.key === "Enter") $("loginBtn").click(); };
+    $("logoutBtn").onclick = () => { $("librarianName").value = ""; showScreen("loginScreen"); };
+    document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => showTab(b.dataset.tab));
+    $("addBookBtn").onclick = addBook;
+    $("addMemberBtn").onclick = addMember;
+    $("issueBtn").onclick = issueBook;
+    $("searchBox").oninput = renderBooks;
+  </script>
+</body>
+
+</html>
